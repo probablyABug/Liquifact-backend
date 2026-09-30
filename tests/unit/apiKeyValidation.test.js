@@ -194,14 +194,14 @@ describe('apiKeyCreateSchema', () => {
     expect(result.success).toBe(false);
   });
 
-  it(`accepts scopes at exactly ${MAX_SCOPES_COUNT} entries (boundary)`, () => {
-    const exactScopes = Array(MAX_SCOPES_COUNT).fill('invoices:read');
-    const result = apiKeyCreateSchema.safeParse(validPayload({ scopes: exactScopes }));
-    expect(result.success).toBe(true);
-  });
 
   it('rejects an unknown scope', () => {
     const result = apiKeyCreateSchema.safeParse(validPayload({ scopes: ['invoices:read', 'unknown:scope'] }));
+    expect(result.success).toBe(false);
+  });
+
+  it('rejects duplicate scopes', () => {
+    const result = apiKeyCreateSchema.safeParse(validPayload({ scopes: ['invoices:read', 'invoices:read'] }));
     expect(result.success).toBe(false);
   });
 
@@ -463,14 +463,14 @@ describe('config/apiKeys — enhanced validateEntry', () => {
     ).toThrow(/must not exceed/);
   });
 
-  it('accepts scopes at exactly max count boundary', () => {
-    const exactScopes = Array(CONFIG_MAX_SCOPES_COUNT).fill('invoices:read');
+
+  it('rejects duplicate scopes', () => {
     expect(() =>
       validateEntry(
-        { key: 'lf_validkey001', clientId: 'svc', scopes: exactScopes },
+        { key: 'lf_validkey001', clientId: 'svc', scopes: ['invoices:read', 'invoices:read'] },
         0
       )
-    ).not.toThrow();
+    ).toThrow(/must not contain duplicates/);
   });
 });
 

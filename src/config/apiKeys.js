@@ -142,6 +142,11 @@ function validateEntry(entry, index) {
     );
   }
 
+  const uniqueScopes = new Set(scopes);
+  if (uniqueScopes.size !== scopes.length) {
+    throw new Error(`API_KEYS[${index}]: "scopes" must not contain duplicates`);
+  }
+
   for (const scope of scopes) {
     if (!VALID_SCOPES.includes(scope)) {
       throw new Error(

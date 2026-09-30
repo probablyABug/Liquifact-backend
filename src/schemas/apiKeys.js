@@ -79,6 +79,10 @@ const scopesSchema = z
   .min(1, { message: 'scopes must be a non-empty array' })
   .max(MAX_SCOPES_COUNT, { message: `scopes must not exceed ${MAX_SCOPES_COUNT} entries` })
   .refine(
+    (scopes) => new Set(scopes).size === scopes.length,
+    { message: 'scopes must not contain duplicates' }
+  )
+  .refine(
     (scopes) => scopes.every((s) => VALID_SCOPES.includes(s)),
     { message: `scopes must only contain: ${VALID_SCOPES.join(', ')}` }
   );
